@@ -6,6 +6,16 @@
 
 A **true agentic AI system** for extracting and classifying clinical concepts from unstructured medical notes using local LLMs (Llama 3.1, Mistral) with autonomous decision-making, multi-step reasoning, UMLS enrichment, and self-correction capabilities.
 
+## 🎥 Demo
+
+<video controls preload="metadata" width="100%">
+  <source src="./concept_extraction_agentic_ai.webm" type="video/webm" />
+  Your browser does not support embedded videos.
+</video>
+
+If the embedded video does not render on your platform, use this direct link:
+[Watch or download the demo](concept_extraction_agentic_ai.webm)
+
 ## 🎯 Key Features
 
 ### ✅ True Agentic AI
