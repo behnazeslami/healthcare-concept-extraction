@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Healthcare Concept Extraction API</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --primary-dark: #4f46e5;
+      --secondary: #ec4899;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #06b6d4;
+      --bg: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text: #f1f5f9;
+      --text-muted: #cbd5e1;
+      --border: #475569;
+      --present: #4ade80;
+      --negated: #f87171;
+      --uncertain: #fbbf24;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1a1f35 100%);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      padding: 60px 20px;
+      text-align: center;
+      margin-bottom: 50px;
+      box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -5%;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .header h1 {
+      font-size: 3em;
+      margin-bottom: 12px;
+      font-weight: 900;
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      opacity: 0.95;
+      font-size: 1.2em;
+      position: relative;
+      z-index: 1;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 30px;
+      border-bottom: 3px solid var(--border);
+      flex-wrap: wrap;
+      background: rgba(30, 41, 59, 0.6);
+      padding: 12px;
+      border-radius: 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 700;
+      border-bottom: 4px solid transparent;
+      transition: all 0.3s;
+      position: relative;
+      top: 2px;
+      border-radius: 8px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+      background: rgba(99, 102, 241, 0.12);
+    }
+
+    .tab-btn.active {
+      color: #fff;
+      border-bottom-color: var(--primary);
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(236, 72, 153, 0.1) 100%);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(51, 65, 85, 0.7) 100%);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 28px;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+
+    .card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 0 40px rgba(99, 102, 241, 0.25);
+      transform: translateY(-4px);
+    }
+
+    .card h3 {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+    }
+
+    .card h3::before {
+      content: '';
+      width: 8px;
+      height: 32px;
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    textarea, input {
+      width: 100%;
+      background: rgba(51, 65, 85, 0.6);
+      border: 2px solid var(--border);
+      color: var(--text);
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-family: 'Fira Code', 'Monaco', monospace;
+      font-size: 13px;
+      transition: all 0.3s;
+    }
+
+    textarea:focus, input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+      background: rgba(51, 65, 85, 0.9);
+    }
+
+    textarea { min-height: 200px; }
+
+    .row {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 15px 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    @media (max-width: 1024px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    button {
+      padding: 13px 24px;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      transition: all 0.3s;
+      font-size: 1em;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(102, 126, 234, 0.15);
+      color: var(--primary-light);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(102, 126, 234, 0.25);
+      transform: translateY(-4px);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+    }
+
+    .btn-success:hover:not(:disabled) {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+    }
+
+    .error {
+      color: var(--danger);
+      background: rgba(239, 68, 68, 0.15);
+      border-left: 5px solid var(--danger);
+      padding: 16px;
+      border-radius: 10px;
+      margin: 12px 0;
+      white-space: pre-wrap;
+    }
+
+    .success {
+      color: var(--success);
+      background: rgba(16, 185, 129, 0.15);
+      border-left: 5px solid var(--success);
+      padding: 16px;
+      border-radius: 10px;
+      margin: 12px 0;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 16px 22px;
+      background: rgba(30, 41, 59, 0.98);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      z-index: 1000;
+      animation: slideIn 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 400px;
+      backdrop-filter: blur(10px);
+    }
+
+    .toast.success { border-left: 5px solid var(--success); }
+    .toast.error { border-left: 5px solid var(--danger); }
+
+    @keyframes slideIn {
+      from { transform: translateX(420px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 16px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(240, 147, 251, 0.1) 100%);
+      border: 2px solid var(--primary);
+      border-radius: 28px;
+      margin: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .pill:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(240, 147, 251, 0.2) 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .tag.present {
+      background: rgba(74, 222, 128, 0.25);
+      color: #4ade80;
+      border: 1.5px solid #4ade80;
+    }
+
+    .tag.negated {
+      background: rgba(248, 113, 113, 0.25);
+      color: #f87171;
+      border: 1.5px solid #f87171;
+    }
+
+    .tag.uncertain {
+      background: rgba(251, 191, 36, 0.25);
+      color: #fbbf24;
+      border: 1.5px solid #fbbf24;
+    }
+
+    .confidence-bar {
+      height: 14px;
+      background: rgba(51, 65, 85, 0.7);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 14px 0;
+      width: 100%;
+      border: 1.5px solid var(--border);
+    }
+
+    .confidence-bar > div {
+      height: 100%;
+      background: linear-gradient(90deg, #4ade80 0%, #fbbf24 50%, #f87171 100%);
+      transition: width 0.5s ease;
+      border-radius: 8px;
+    }
+
+    .kpi {
+      min-width: 160px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
+      padding: 18px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(102, 126, 234, 0.3);
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .kpi:hover {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(240, 147, 251, 0.1) 100%);
+      transform: translateY(-4px);
+    }
+
+    .kpi-label {
+      font-size: 0.75em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: 0.8px;
+    }
+
+    .kpi-value {
+      font-size: 2.2em;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .kpi-icon {
+      font-size: 3em;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border-bottom: 1px solid rgba(71, 85, 105, 0.6);
+      padding: 16px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(240, 147, 251, 0.08) 100%);
+      font-weight: 800;
+      color: var(--primary-light);
+    }
+
+    tr:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    details {
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 14px 0;
+      background: rgba(51, 65, 85, 0.4);
+      transition: all 0.3s;
+    }
+
+    details:hover {
+      background: rgba(102, 126, 234, 0.12);
+      border-color: var(--primary);
+    }
+
+    details summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--primary-light);
+      user-select: none;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 4px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+      font-size: 0.95em;
+      letter-spacing: 0.3px;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      backdrop-filter: blur(5px);
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .loading-box {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.98) 0%, rgba(51, 65, 85, 0.95) 100%);
+      padding: 50px;
+      border-radius: 18px;
+      text-align: center;
+      border: 2px solid var(--primary);
+      backdrop-filter: blur(10px);
+    }
+
+    .loading-box .spinner {
+      width: 60px;
+      height: 60px;
+      border-width: 6px;
+      margin-bottom: 25px;
+    }
+
+    a {
+      color: #22d3ee;
+      text-decoration: none;
+      word-break: break-all;
+      transition: all 0.3s;
+    }
+
+    a:hover {
+      text-decoration: underline;
+      color: #06b6d4;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin: 24px 0;
+      background: rgba(51, 65, 85, 0.4);
+      border-radius: 14px;
+      padding: 18px;
+      border: 1.5px solid var(--border);
+    }
+
+    .hljs {
+      background: rgba(51, 65, 85, 0.6) !important;
+      color: var(--text) !important;
+      border-radius: 12px;
+      padding: 16px !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-box">
+      <div class="spinner"></div>
+      <p>🧬 Processing clinical data...</p>
+    </div>
+  </div>
+
+  <div class="header">
+    <h1>🏥 Healthcare Concept Extraction</h1>
+    <p>AI-powered clinical concept identification with UMLS enrichment</p>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <h3>⚙️ Request Configuration</h3>
+      
+      <div class="row">
+        <label class="label" style="flex: 1;">API URL</label>
+        <div class="muted" style="font-size: 0.9em;">Ensure the server is running on port 8002</div>
+      </div>
+      <div class="row">
+        <input id="apiUrl" value="http://127.0.0.1:8002/reason" style="flex: 1;" />
+        <button class="btn-secondary" onclick="testConnection()" title="Test API connectivity">🔗 Test Connection</button>
+      </div>
+
+      <div id="connStatus" style="margin-top: 12px;"></div>
+
+      <div class="row" style="margin-top: 22px;">
+        <span class="label">Request Payload</span>
+        <button class="btn-secondary" onclick="formatJSON()" title="Auto-format JSON">📐 Format</button>
+        <button class="btn-secondary" onclick="loadExample()" title="Load example clinical case">📋 Example</button>
+        <button class="btn-secondary" onclick="clearPayload()" title="Clear payload">🗑️ Clear</button>
+      </div>
+      <textarea id="payload"></textarea>
+      <div id="reqErr"></div>
+    </div>
+
+    <div class="row" style="justify-content: center; margin: 30px 0;">
+      <button class="btn-primary" id="runBtn" onclick="runRequest()" style="font-size: 1.15em; padding: 16px 50px;">
+        ▶️ Run Analysis
+      </button>
+    </div>
+
+    <div id="results-section" style="display: none;">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('summary')">📊 Summary</button>
+        <button class="tab-btn" onclick="switchTab('concepts')">🏷️ Concepts</button>
+        <button class="tab-btn" onclick="switchTab('umls')">🔬 UMLS</button>
+        <button class="tab-btn" onclick="switchTab('reasoning')">🧠 Reasoning</button>
+        <button class="tab-btn" onclick="switchTab('raw')">📄 Raw JSON</button>
+      </div>
+
+      <!-- Summary Tab -->
+      <div id="summary" class="tab-content active">
+        <div class="grid">
+          <div class="card">
+            <h3>📈 Key Metrics</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="kpi">
+                <div class="kpi-icon">✅</div>
+                <div class="kpi-label">Status</div>
+                <div id="kpi-status" class="kpi-value" style="color: var(--success);">—</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-icon">🔢</div>
+                <div class="kpi-label">Concepts</div>
+                <div id="kpi-conceptCount" class="kpi-value">—</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-icon">⚡</div>
+                <div class="kpi-label">Runtime</div>
+                <div id="kpi-runtime" class="kpi-value">—</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-icon">🎯</div>
+                <div class="kpi-label">Confidence</div>
+                <div id="kpi-confidence" class="kpi-value">—</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-icon">🔗</div>
+                <div class="kpi-label">Record ID</div>
+                <div id="kpi-recordId" class="kpi-value" style="font-size: 1.5em;">—</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-icon">🧩</div>
+                <div class="kpi-label">Steps</div>
+                <div id="kpi-steps" class="kpi-value">—</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 28px;">
+              <label class="kpi-label">🎯 Confidence Score</label>
+              <div class="confidence-bar">
+                <div id="confBar" style="width: 0%"></div>
+              </div>
+              <div class="muted" style="font-size: 0.85em;">Overall model confidence in the extraction</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>ℹ️ Metadata</h3>
+            <div style="display: flex; flex-direction: column; gap: 18px;">
+              <div>
+                <div class="kpi-label">🤖 Model Used</div>
+                <div id="meta-model" class="muted" style="font-size: 1.1em;">—</div>
+              </div>
+              <div>
+                <div class="kpi-label">🔄 Self-Corrected</div>
+                <div id="meta-selfcorr" class="muted" style="font-size: 1.1em;">—</div>
+              </div>
+              <div>
+                <div class="kpi-label">💾 Learned from Memory</div>
+                <div id="meta-memory" class="muted" style="font-size: 1.1em;">—</div>
+              </div>
+              <div>
+                <div class="kpi-label">🎯 Goal</div>
+                <div id="meta-goal" class="muted" style="word-break: break-word; font-size: 1.1em;">—</div>
+              </div>
+              <div>
+                <div class="kpi-label">⏱️ Section Timings</div>
+                <div id="timingsList" class="muted" style="font-size: 0.95em;">No timing data</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Concepts Tab -->
+      <div id="concepts" class="tab-content">
+        <div class="card">
+          <h3>🏷️ Extracted Concepts</h3>
+          <div class="muted" style="margin-bottom: 18px; font-size: 0.95em;">Auto-labeled based on clinical context (PRESENT / NEGATED / UNCERTAIN)</div>
+          <div id="conceptsList"></div>
+        </div>
+      </div>
+
+      <!-- UMLS Tab -->
+      <div id="umls" class="tab-content">
+        <div class="card">
+          <h3>🔬 UMLS Enrichment</h3>
+          <input type="text" id="filterBox" class="filter-box" placeholder="🔍 Filter by concept, CUI, or preferred name..." />
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Concept</th>
+                  <th>Preferred Name</th>
+                  <th>CUI</th>
+                  <th>Status</th>
+                  <th>SNOMED CT</th>
+                </tr>
+              </thead>
+              <tbody id="umlsTable">
+                <tr><td colspan="5" class="muted">No enrichment data</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 28px;">
+          <h3>📋 Concept Details</h3>
+          <div id="conceptDetail" class="muted">Click a concept to view detailed UMLS information</div>
+        </div>
+      </div>
+
+      <!-- Reasoning Tab -->
+      <div id="reasoning" class="tab-content">
+        <div id="reasoningChain"></div>
+      </div>
+
+      <!-- Raw JSON Tab -->
+      <div id="raw" class="tab-content">
+        <div class="card">
+          <h3>📄 Complete Response</h3>
+          <div class="row">
+            <button class="btn-success" onclick="copyJSON()">📋 Copy JSON</button>
+            <button class="btn-success" onclick="downloadJSON()">⬇️ Download</button>
+          </div>
+          <pre id="rawJsonPre"><code id="rawJson" class="language-json"></code></pre>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 30px; justify-content: center;">
+        <button class="btn-danger" onclick="clearResults()">🗑️ Clear Results</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const payloadEl = document.getElementById("payload");
+  const apiUrlEl = document.getElementById("apiUrl");
+  const runBtn = document.getElementById("runBtn");
+
+  function loadExample() {
+    payloadEl.value = JSON.stringify({
+      clinical_text: "The patient is a 58-year-old male with a long-standing history of poorly controlled asthma, hypertension, and type 2 diabetes mellitus. He presented to the emergency department after experiencing a sudden onset of severe shortness of breath, chest tightness, and audible wheezing while cleaning his basement, which was particularly dusty. He reports that his symptoms rapidly worsened over the course of an hour, and he became unable to speak in full sentences. He also describes a sensation of suffocation and noted that his rescue inhaler provided minimal relief. On arrival, he was tachypneic, using accessory muscles of respiration, and had an oxygen saturation of 88% on room air. Physical examination revealed diffuse expiratory wheezes, decreased air entry bilaterally, and mild cyanosis of the lips. Past medical history is significant for multiple prior hospitalizations for asthma exacerbations, including two ICU admissions requiring non-invasive ventilation. He is currently on high-dose inhaled corticosteroids, long-acting beta-agonists, and a leukotriene receptor antagonist. He denies fever, chills, or productive cough. Laboratory studies show mild leukocytosis, and chest X-ray is negative for infiltrates. The patient was started on supplemental oxygen, nebulized bronchodilators, intravenous corticosteroids, and close monitoring in the respiratory care unit.",
+      main_note: "58-year-old male with severe asthma exacerbation, presenting with acute respiratory distress after dust exposure. History of hypertension and diabetes.",
+      record_id: "OPEN_001"
+    }, null, 2);
+  }
+
+  loadExample();
+
+  function escapeHtml(s) {
+    return String(s || "").replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function formatJSON() {
+    try {
+      const parsed = JSON.parse(payloadEl.value);
+      payloadEl.value = JSON.stringify(parsed, null, 2);
+      showToast("✅ Formatted successfully", "success");
+    } catch (e) {
+      showToast("❌ Invalid JSON: " + e.message, "error");
+    }
+  }
+
+  function clearPayload() { payloadEl.value = ""; }
+  function clearResults() { document.getElementById("results-section").style.display = "none"; }
+
+  function showToast(message, type = "info") {
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  function switchTab(tabName) {
+    document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+    document.getElementById(tabName).classList.add("active");
+    event.target.classList.add("active");
+  }
+
+  async function testConnection() {
+    try {
+      const response = await fetch(apiUrlEl.value, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clinical_text: "test", record_id: "TEST" })
+      });
+      const connStatus = document.getElementById("connStatus");
+      if (response.ok) {
+        connStatus.innerHTML = '<div class="success">✅ Connection successful!</div>';
+      } else {
+        connStatus.innerHTML = '<div class="error">❌ Server returned ' + response.status + '</div>';
+      }
+    } catch (e) {
+      document.getElementById("connStatus").innerHTML = '<div class="error">❌ Connection failed: ' + e.message + '</div>';
+    }
+  }
+
+  function labelConcept(concept, clinicalText) {
+    const c = String(concept || "").toLowerCase().trim();
+    const t = String(clinicalText || "").toLowerCase();
+    if (!c || !t) return "present";
+
+    const uncertainCues = ["possible", "possibly", "suspect", "suspected", "concern for", "may have", "might have", "rule out", "r/o"];
+    const sentences = t.split(/[\.\!\?]\s+/).map(s => s.trim()).filter(Boolean);
+
+    for (const cue of uncertainCues) {
+      for (const s of sentences) {
+        if (s.includes(cue) && s.includes(c)) return "uncertain";
+      }
+    }
+
+    const negCues = ["denies", "deny", "no ", "without", "negative for", "free of"];
+    for (const s of sentences) {
+      if (!s.includes(c)) continue;
+      for (const cue of negCues) {
+        const idxCue = s.indexOf(cue);
+        const idxCon = s.indexOf(c);
+        if (idxCue >= 0 && idxCon >= 0 && idxCue < idxCon) return "negated";
+      }
+    }
+    return "present";
+  }
+
+  function safeToFixed(x, digits = 2) {
+    return typeof x === "number" && isFinite(x) ? x.toFixed(digits) : String(x ?? "");
+  }
+
+  async function runRequest() {
+    document.getElementById("connStatus").innerHTML = "";
+    
+    let payload;
+    try {
+      payload = JSON.parse(payloadEl.value);
+    } catch (e) {
+      showToast("❌ Invalid JSON in request", "error");
+      return;
+    }
+
+    runBtn.disabled = true;
+    document.getElementById("loadingOverlay").classList.add("active");
+
+    try {
+      const response = await fetch(apiUrlEl.value.trim(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      if (data.error) throw new Error(data.error);
+
+      renderResponse(data, payload);
+      showToast("✅ Analysis complete", "success");
+    } catch (err) {
+      showToast("❌ " + err.message, "error");
+    } finally {
+      runBtn.disabled = false;
+      document.getElementById("loadingOverlay").classList.remove("active");
+    }
+  }
+
+  function renderResponse(resp, req) {
+    window._lastResp = resp;
+    window._lastReq = req;
+
+    document.getElementById("results-section").style.display = "block";
+
+    document.getElementById("kpi-status").textContent = resp.status || "—";
+    document.getElementById("kpi-recordId").textContent = resp.record_id || "—";
+    document.getElementById("kpi-conceptCount").textContent = (resp.extracted_concepts || []).length;
+    document.getElementById("kpi-runtime").textContent = safeToFixed(resp.script_runtime, 2) + "s";
+    document.getElementById("kpi-steps").textContent = resp.total_reasoning_steps || "—";
+    
+    const conf = typeof resp.confidence === "number" ? Math.round(resp.confidence * 100) : 0;
+    document.getElementById("kpi-confidence").textContent = conf + "%";
+    document.getElementById("confBar").style.width = conf + "%";
+
+    document.getElementById("meta-model").textContent = resp.model_used || "—";
+    document.getElementById("meta-selfcorr").textContent = resp.self_corrected ? "✅ Yes" : "❌ No";
+    document.getElementById("meta-memory").textContent = resp.learned_from_memory ? "✅ Yes" : "❌ No";
+    document.getElementById("meta-goal").textContent = resp.goal || "—";
+
+    const timings = resp.section_timings || {};
+    const timingsList = document.getElementById("timingsList");
+    if (Object.keys(timings).length) {
+      timingsList.innerHTML = Object.entries(timings).map(([k, v]) => 
+        `<div style="display: flex; justify-content: space-between; margin: 8px 0; padding: 8px; background: rgba(102,126,234,0.1); border-radius: 6px;">
+          <span>${escapeHtml(k)}</span>
+          <strong>${safeToFixed(v, 2)}s</strong>
+        </div>`
+      ).join("");
+    }
+
+    const concepts = (resp.extracted_concepts || []).map(c => {
+      const status = labelConcept(c, req.clinical_text || "");
+      const tagClass = status === "negated" ? "negated" : (status === "uncertain" ? "uncertain" : "present");
+      const tagText = { negated: "NEGATED", uncertain: "UNCERTAIN", present: "PRESENT" }[status];
+      return `
+        <button class="pill concept-chip" onclick="showConceptDetail(${JSON.stringify(c)})">
+          <span>${escapeHtml(c)}</span>
+          <span class="tag ${tagClass}">${tagText}</span>
+        </button>
+      `;
+    }).join("");
+    document.getElementById("conceptsList").innerHTML = concepts || '<div class="muted">No concepts extracted</div>';
+
+    const umls = resp.umls_enrichment || {};
+    const umlsRows = Object.entries(umls).map(([concept, u]) => {
+      const snomedLinks = (u.snomed_ct || []).length
+        ? u.snomed_ct.map(url => `<a href="${escapeHtml(url)}" target="_blank">🔗</a>`).join(" ")
+        : "—";
+      return `
+        <tr onclick="showConceptDetail(${JSON.stringify(concept)})">
+          <td><strong>${escapeHtml(concept)}</strong></td>
+          <td>${escapeHtml(u.preferred_name || "")}</td>
+          <td><code>${escapeHtml(u.cui || "")}</code></td>
+          <td>${u.found ? "✅" : "❌"}</td>
+          <td>${snomedLinks}</td>
+        </tr>
+      `;
+    }).join("");
+    document.getElementById("umlsTable").innerHTML = umlsRows || '<tr><td colspan="5" class="muted">No enrichment</td></tr>';
+
+    const filterBox = document.getElementById("filterBox");
+    filterBox.value = "";
+    filterBox.addEventListener("input", () => {
+      const q = filterBox.value.toLowerCase();
+      document.querySelectorAll("#umlsTable tr").forEach(tr => {
+        tr.style.display = tr.innerText.toLowerCase().includes(q) ? "" : "none";
+      });
+    });
+
+    const steps = (resp.reasoning_chain || []).map(s => `
+      <details class="card">
+        <summary><strong>Step ${escapeHtml(s.step_number)}</strong> — ${escapeHtml(s.action)} <span class="muted">(conf ${safeToFixed(s.confidence)})</span></summary>
+        <div>
+          <div><strong>💭 Thought:</strong> ${escapeHtml(s.thought)}</div>
+          <div style="margin-top: 12px;"><strong>👀 Observation:</strong> ${escapeHtml(s.observation)}</div>
+        </div>
+      </details>
+    `).join("");
+    document.getElementById("reasoningChain").innerHTML = steps || '<div class="card muted">No reasoning steps</div>';
+
+    document.getElementById("rawJson").textContent = JSON.stringify(resp, null, 2);
+    hljs.highlightElement(document.getElementById("rawJson"));
+  }
+
+  window.showConceptDetail = function(concept) {
+    const resp = window._lastResp || {};
+    const req = window._lastReq || {};
+    const u = (resp.umls_enrichment || {})[concept];
+    const status = labelConcept(concept, req.clinical_text || "");
+    const tagClass = status === "negated" ? "negated" : (status === "uncertain" ? "uncertain" : "present");
+    const tagText = { negated: "NEGATED", uncertain: "UNCERTAIN", present: "PRESENT" }[status];
+
+    let html = `
+      <div class="row">
+        <strong>${escapeHtml(concept)}</strong>
+        <span class="tag ${tagClass}">${tagText}</span>
+      </div>
+    `;
+
+    if (u) {
+      const snomed = (u.snomed_ct || []).length
+        ? u.snomed_ct.map(x => `<div><a href="${escapeHtml(x)}" target="_blank">🔗 ${escapeHtml(x)}</a></div>`).join("")
+        : "—";
+      html += `
+        <div style="margin-top: 16px;">
+          <div><strong>Preferred Name:</strong> ${escapeHtml(u.preferred_name || "")}</div>
+          <div style="margin-top: 10px;"><strong>CUI:</strong> <code style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 4px;">${escapeHtml(u.cui || "")}</code></div>
+          <div style="margin-top: 10px;"><strong>Found:</strong> ${u.found ? "✅ Yes" : "❌ No"}</div>
+          <div style="margin-top: 10px;"><strong>SNOMED CT:</strong><div style="margin-top: 8px;">${snomed}</div></div>
+        </div>
+      `;
+    } else {
+      html += '<div class="muted" style="margin-top: 16px;">No UMLS enrichment data</div>';
+    }
+
+    document.getElementById("conceptDetail").innerHTML = html;
+  };
+
+  window.copyJSON = async function() {
+    const json = JSON.stringify(window._lastResp, null, 2);
+    try {
+      await navigator.clipboard.writeText(json);
+      showToast("✅ Copied to clipboard", "success");
+    } catch {
+      showToast("❌ Copy failed", "error");
+    }
+  };
+
+  window.downloadJSON = function() {
+    const json = JSON.stringify(window._lastResp, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = (window._lastResp?.record_id || "concept-extraction") + ".json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  };
+</script>
+</body>
+</html>
