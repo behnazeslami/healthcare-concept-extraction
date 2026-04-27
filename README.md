@@ -12,6 +12,8 @@ A **true agentic AI system** for extracting and classifying clinical concepts fr
   <source src="./concept_extraction_agentic_ai_demo.mp4" type="video/mp4" />
 </video>
 
+https://github.com/user-attachments/assets/bcd36dd7-64b4-4d67-b927-0230615d50ac
+
 If the embedded video does not render on your platform, use this direct link:
 [Watch or download the demo](concept_extraction_agentic_ai_demo.mp4)
 
