@@ -103,6 +103,7 @@ class ConceptExtractorTool:
                 temperature=temperature,
                 top_p=0.95,
                 max_new_tokens=1024,  # Allow many tokens for comprehensive extraction
+                max_length=None,  # Avoid conflict with max_new_tokens
                 repetition_penalty=1.2,
                 eos_token_id=self.tokenizer.eos_token_id
             )

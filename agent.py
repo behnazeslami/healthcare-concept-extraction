@@ -121,7 +121,15 @@ class HealthcareAgenticAI:
             elif next_action == "learn_from_memory" and ToolName.MEMORY in request.enable_tools:
                 state = await self._step_learn_from_memory(state, request)
             else:
-                # No valid action, stop reasoning
+                # No valid action (tool disabled or unknown), stop reasoning and log it
+                # Note: current_step was already incremented before the tool checks above
+                state.reasoning_log.append(ReasoningStep(
+                    step_number=state.current_step,
+                    thought="⚠️ Agent decision: Required tool not enabled or no valid action available.",
+                    action="STOP",
+                    observation="Reasoning halted due to tool constraints or completion of analysis.",
+                    confidence=state.confidence
+                ))
                 break
 
         runtime = time.time() - start_time

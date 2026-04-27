@@ -6,761 +6,1242 @@
   <title>Healthcare Concept Extraction API</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
     :root {
-      --primary: #6366f1;
-      --primary-light: #818cf8;
-      --primary-dark: #4f46e5;
-      --secondary: #ec4899;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --info: #06b6d4;
-      --bg: #0f172a;
-      --bg-secondary: #1e293b;
-      --bg-tertiary: #334155;
-      --text: #f1f5f9;
-      --text-muted: #cbd5e1;
-      --border: #475569;
-      --present: #4ade80;
-      --negated: #f87171;
-      --uncertain: #fbbf24;
+      --primary:        #0f6fff;
+      --primary-light:  #e8f0ff;
+      --primary-mid:    #3d85ff;
+      --primary-dark:   #0049cc;
+      --accent:         #00c9a7;
+      --accent-light:   #e0faf5;
+      --danger:         #e8304a;
+      --danger-light:   #fdeaed;
+      --warning:        #f59e0b;
+      --warning-light:  #fef3cd;
+      --success:        #16a34a;
+      --success-light:  #dcfce7;
+      --present:        #16a34a;
+      --negated:        #e8304a;
+      --uncertain:      #d97706;
+
+      --bg:             #f4f6fb;
+      --surface:        #ffffff;
+      --surface-2:      #f8fafc;
+      --border:         #e2e8f0;
+      --border-strong:  #cbd5e1;
+      --text:           #0f1a2e;
+      --text-2:         #3d4f6b;
+      --text-muted:     #7a8fac;
+      --shadow-sm:      0 1px 3px rgba(15,26,46,0.06), 0 1px 2px rgba(15,26,46,0.04);
+      --shadow:         0 4px 12px rgba(15,26,46,0.08), 0 2px 4px rgba(15,26,46,0.05);
+      --shadow-lg:      0 16px 40px rgba(15,26,46,0.12), 0 4px 12px rgba(15,26,46,0.07);
+      --radius:         14px;
+      --radius-sm:      8px;
+      --radius-lg:      20px;
     }
 
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #1a1f35 100%);
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
       color: var(--text);
       line-height: 1.6;
       overflow-x: hidden;
+      min-height: 100vh;
     }
 
+    /* ── HEADER ── */
     .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-      padding: 60px 20px;
-      text-align: center;
-      margin-bottom: 50px;
-      box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-logo {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-mid) 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-logo svg { width: 22px; height: 22px; }
+
+    .header-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .header-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid rgba(0,201,167,0.3);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.8); }
+    }
+
+    /* ── HERO BAND ── */
+    .hero {
+      background: linear-gradient(135deg, #0f6fff 0%, #1a73e8 50%, #0049cc 100%);
+      padding: 52px 40px 48px;
       position: relative;
       overflow: hidden;
     }
 
-    .header::before {
+    .hero::before {
       content: '';
       position: absolute;
-      top: -50%;
-      right: -10%;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-      border-radius: 50%;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 50%),
+        radial-gradient(circle at 10% 80%, rgba(0,201,167,0.18) 0%, transparent 40%);
     }
 
-    .header::after {
-      content: '';
+    .hero-grid-overlay {
       position: absolute;
-      bottom: -30%;
-      left: -5%;
-      width: 350px;
-      height: 350px;
-      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
-      border-radius: 50%;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
     }
 
-    .header h1 {
-      font-size: 3em;
-      margin-bottom: 12px;
-      font-weight: 900;
+    .hero-inner {
       position: relative;
-      z-index: 1;
-      background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .header p {
-      opacity: 0.95;
-      font-size: 1.2em;
-      position: relative;
-      z-index: 1;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-
-    .container {
-      max-width: 1600px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 0 20px;
     }
 
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 30px;
-      border-bottom: 3px solid var(--border);
-      flex-wrap: wrap;
-      background: rgba(30, 41, 59, 0.6);
-      padding: 12px;
-      border-radius: 14px;
-      backdrop-filter: blur(10px);
-    }
-
-    .tab-btn {
-      padding: 12px 24px;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 1em;
-      font-weight: 700;
-      border-bottom: 4px solid transparent;
-      transition: all 0.3s;
-      position: relative;
-      top: 2px;
-      border-radius: 8px;
-    }
-
-    .tab-btn:hover {
-      color: var(--text);
-      background: rgba(99, 102, 241, 0.12);
-    }
-
-    .tab-btn.active {
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.6rem;
       color: #fff;
-      border-bottom-color: var(--primary);
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(236, 72, 153, 0.1) 100%);
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      line-height: 1.2;
     }
 
-    .tab-content {
-      display: none;
+    .hero p {
+      color: rgba(255,255,255,0.8);
+      font-size: 1rem;
+      font-weight: 400;
+      max-width: 500px;
     }
 
-    .tab-content.active {
-      display: block;
-      animation: fadeIn 0.3s;
+    .hero-pills {
+      display: flex;
+      gap: 10px;
+      margin-top: 22px;
+      flex-wrap: wrap;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      color: #fff;
+      font-weight: 500;
     }
 
+    /* ── MAIN LAYOUT ── */
+    .main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 36px 32px 60px;
+    }
+
+    /* ── CARD ── */
     .card {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(51, 65, 85, 0.7) 100%);
-      border: 1.5px solid var(--border);
-      border-radius: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
       padding: 28px;
-      margin-bottom: 28px;
-      transition: all 0.3s;
-      backdrop-filter: blur(10px);
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s, border-color 0.2s;
     }
 
     .card:hover {
-      border-color: var(--primary);
-      box-shadow: 0 0 40px rgba(99, 102, 241, 0.25);
-      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+      border-color: var(--border-strong);
     }
 
-    .card h3 {
-      font-size: 1.5em;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .card-header {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-weight: 900;
+      margin-bottom: 22px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .card h3::before {
-      content: '';
-      width: 8px;
-      height: 32px;
-      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-      border-radius: 4px;
-      display: block;
+    .card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
     }
 
-    textarea, input {
-      width: 100%;
-      background: rgba(51, 65, 85, 0.6);
-      border: 2px solid var(--border);
+    .card-icon.blue   { background: var(--primary-light); color: var(--primary); }
+    .card-icon.green  { background: var(--success-light); color: var(--success); }
+    .card-icon.teal   { background: var(--accent-light);  color: var(--accent); }
+    .card-icon.amber  { background: var(--warning-light); color: var(--warning); }
+    .card-icon.red    { background: var(--danger-light);  color: var(--danger); }
+
+    .card-icon svg { width: 18px; height: 18px; }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
       color: var(--text);
-      padding: 14px 16px;
-      border-radius: 12px;
-      font-family: 'Fira Code', 'Monaco', monospace;
-      font-size: 13px;
-      transition: all 0.3s;
+      letter-spacing: -0.01em;
+    }
+
+    .card-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── FORM ELEMENTS ── */
+    .form-group { margin-bottom: 20px; }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 8px;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+    }
+
+    .form-label svg { width: 14px; height: 14px; }
+
+    textarea, input[type="text"], input[type="url"] {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Mono', monospace;
+      font-size: 12.5px;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      line-height: 1.7;
     }
 
     textarea:focus, input:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
-      background: rgba(51, 65, 85, 0.9);
+      box-shadow: 0 0 0 3px rgba(15,111,255,0.12);
+      background: #fff;
     }
 
-    textarea { min-height: 200px; }
+    textarea { min-height: 210px; resize: vertical; }
 
-    .row {
+    .input-row {
       display: flex;
-      gap: 14px;
+      gap: 10px;
       align-items: center;
-      flex-wrap: wrap;
-      margin: 15px 0;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 28px;
-    }
+    .input-row input { flex: 1; }
 
-    @media (max-width: 1024px) {
-      .grid { grid-template-columns: 1fr; }
-    }
-
-    button {
-      padding: 13px 24px;
-      cursor: pointer;
-      border: none;
-      border-radius: 10px;
-      font-weight: 700;
-      transition: all 0.3s;
-      font-size: 1em;
+    /* ── BUTTONS ── */
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      letter-spacing: 0.5px;
+      gap: 7px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+      letter-spacing: 0.01em;
     }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
 
     .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(15,111,255,0.3);
     }
-
     .btn-primary:hover:not(:disabled) {
-      transform: translateY(-4px);
-      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(15,111,255,0.35);
     }
 
-    .btn-secondary {
-      background: rgba(102, 126, 234, 0.15);
-      color: var(--primary-light);
-      border: 2px solid var(--primary);
+    .btn-outline {
+      background: var(--surface);
+      color: var(--text-2);
+      border: 1.5px solid var(--border-strong);
     }
-
-    .btn-secondary:hover:not(:disabled) {
-      background: rgba(102, 126, 234, 0.25);
-      transform: translateY(-4px);
+    .btn-outline:hover:not(:disabled) {
+      background: var(--surface-2);
+      border-color: var(--primary);
+      color: var(--primary);
     }
 
     .btn-success {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: white;
+      background: var(--success);
+      color: #fff;
     }
-
-    .btn-success:hover:not(:disabled) {
-      transform: translateY(-4px);
-      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
-    }
+    .btn-success:hover:not(:disabled) { background: #15803d; transform: translateY(-1px); }
 
     .btn-danger {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      color: white;
-    }
-
-    .error {
+      background: var(--danger-light);
       color: var(--danger);
-      background: rgba(239, 68, 68, 0.15);
-      border-left: 5px solid var(--danger);
-      padding: 16px;
+      border: 1.5px solid rgba(232,48,74,0.2);
+    }
+    .btn-danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
+
+    .btn-lg {
+      padding: 14px 36px;
+      font-size: 0.95rem;
       border-radius: 10px;
-      margin: 12px 0;
-      white-space: pre-wrap;
     }
 
-    .success {
-      color: var(--success);
-      background: rgba(16, 185, 129, 0.15);
-      border-left: 5px solid var(--success);
-      padding: 16px;
-      border-radius: 10px;
-      margin: 12px 0;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 16px 22px;
-      background: rgba(30, 41, 59, 0.98);
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      z-index: 1000;
-      animation: slideIn 0.3s;
+    /* ── ACTION ROW ── */
+    .action-row {
       display: flex;
+      gap: 8px;
       align-items: center;
-      gap: 10px;
-      max-width: 400px;
-      backdrop-filter: blur(10px);
+      flex-wrap: wrap;
+      margin-bottom: 12px;
     }
 
-    .toast.success { border-left: 5px solid var(--success); }
-    .toast.error { border-left: 5px solid var(--danger); }
-
-    @keyframes slideIn {
-      from { transform: translateX(420px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+    /* ── RUN BUTTON SECTION ── */
+    .run-section {
+      text-align: center;
+      padding: 20px 0 32px;
     }
 
-    .pill {
+    /* ── TABS ── */
+    .tabs-wrapper {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .tabs-nav {
+      display: flex;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 6px 0;
+      gap: 2px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 11px 16px;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(240, 147, 251, 0.1) 100%);
-      border: 2px solid var(--primary);
-      border-radius: 28px;
-      margin: 8px;
-      font-size: 13px;
+      gap: 7px;
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
       cursor: pointer;
-      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
       font-weight: 600;
-      color: #ffffff;
+      border-radius: 8px 8px 0 0;
+      transition: all 0.2s;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      position: relative;
+      bottom: -1px;
     }
 
-    .pill:hover {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(240, 147, 251, 0.2) 100%);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    .tab-btn svg { width: 15px; height: 15px; }
+
+    .tab-btn:hover { color: var(--text-2); background: rgba(15,111,255,0.05); }
+
+    .tab-btn.active {
+      color: var(--primary);
+      background: var(--surface);
+      border-bottom-color: var(--primary);
     }
 
-    .tag {
-      font-size: 11px;
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-weight: 800;
+    .tabs-body { padding: 28px; }
+
+    .tab-content { display: none; }
+    .tab-content.active {
+      display: block;
+      animation: fadeUp 0.25s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── GRID ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    @media (max-width: 1024px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ── KPI CARDS ── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    @media (max-width: 700px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .kpi {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 16px;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-mid));
+      border-radius: 2px 2px 0 0;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .kpi:hover { border-color: var(--primary); box-shadow: 0 4px 14px rgba(15,111,255,0.1); }
+    .kpi:hover::before { opacity: 1; }
+
+    .kpi-icon-wrap {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .kpi-icon-wrap svg { width: 17px; height: 17px; }
+
+    .kpi-label {
+      font-size: 0.72rem;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
     }
 
-    .tag.present {
-      background: rgba(74, 222, 128, 0.25);
-      color: #4ade80;
-      border: 1.5px solid #4ade80;
+    .kpi-value {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+      font-family: 'DM Serif Display', serif;
     }
 
-    .tag.negated {
-      background: rgba(248, 113, 113, 0.25);
-      color: #f87171;
-      border: 1.5px solid #f87171;
-    }
-
-    .tag.uncertain {
-      background: rgba(251, 191, 36, 0.25);
-      color: #fbbf24;
-      border: 1.5px solid #fbbf24;
-    }
+    /* ── CONFIDENCE BAR ── */
+    .conf-section { margin-top: 22px; }
+    .conf-label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .conf-label { font-size: 0.78rem; font-weight: 600; color: var(--text-2); }
+    .conf-pct { font-size: 0.78rem; font-weight: 700; color: var(--primary); }
 
     .confidence-bar {
-      height: 14px;
-      background: rgba(51, 65, 85, 0.7);
-      border-radius: 10px;
+      height: 8px;
+      background: var(--border);
+      border-radius: 99px;
       overflow: hidden;
-      margin: 14px 0;
-      width: 100%;
-      border: 1.5px solid var(--border);
     }
 
     .confidence-bar > div {
       height: 100%;
-      background: linear-gradient(90deg, #4ade80 0%, #fbbf24 50%, #f87171 100%);
-      transition: width 0.5s ease;
-      border-radius: 8px;
+      background: linear-gradient(90deg, var(--success) 0%, var(--primary) 60%, var(--danger) 100%);
+      border-radius: 99px;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .kpi {
-      min-width: 160px;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.05) 100%);
-      padding: 18px;
-      border-radius: 14px;
-      border: 1.5px solid rgba(102, 126, 234, 0.3);
-      transition: all 0.3s;
-      text-align: center;
+    /* ── META ITEMS ── */
+    .meta-list { display: flex; flex-direction: column; gap: 14px; }
+
+    .meta-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
     }
 
-    .kpi:hover {
-      border-color: var(--primary);
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(240, 147, 251, 0.1) 100%);
-      transform: translateY(-4px);
+    .meta-item-icon {
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
     }
 
-    .kpi-label {
-      font-size: 0.75em;
-      color: var(--text-muted);
+    .meta-item-icon svg { width: 14px; height: 14px; }
+
+    .meta-item-label {
+      font-size: 0.7rem;
       text-transform: uppercase;
-      font-weight: 800;
-      margin-bottom: 10px;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 3px;
     }
 
-    .kpi-value {
-      font-size: 2.2em;
-      font-weight: 900;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 8px;
+    .meta-item-value {
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 500;
+      word-break: break-word;
     }
 
-    .kpi-icon {
-      font-size: 3em;
-      margin-bottom: 8px;
-      display: block;
+    /* ── STATUS/ALERT BANNERS ── */
+    .alert {
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      margin: 12px 0;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .alert svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .alert-success { background: var(--success-light); color: var(--success); border: 1px solid rgba(22,163,74,0.2); }
+    .alert-error   { background: var(--danger-light);  color: var(--danger);  border: 1px solid rgba(232,48,74,0.2); }
+
+    /* ── CONCEPT CHIPS ── */
+    .concepts-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .concept-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 14px;
+      background: var(--surface-2);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 24px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.18s;
     }
 
-    th, td {
-      border-bottom: 1px solid rgba(71, 85, 105, 0.6);
-      padding: 16px;
-      text-align: left;
-      font-size: 13px;
+    .concept-chip:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(15,111,255,0.15);
     }
+
+    /* ── STATUS TAGS ── */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 9px;
+      border-radius: 5px;
+    }
+
+    .tag-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+    .tag.present  { background: var(--success-light); color: var(--present); }
+    .tag.negated  { background: var(--danger-light);  color: var(--negated); }
+    .tag.uncertain { background: var(--warning-light); color: var(--uncertain); }
+    .tag.present .tag-dot  { background: var(--present); }
+    .tag.negated .tag-dot  { background: var(--negated); }
+    .tag.uncertain .tag-dot { background: var(--uncertain); }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+
+    thead tr { background: var(--surface-2); }
 
     th {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(240, 147, 251, 0.08) 100%);
-      font-weight: 800;
-      color: var(--primary-light);
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
     }
 
-    tr:hover {
-      background: rgba(102, 126, 234, 0.1);
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-2);
+      vertical-align: middle;
     }
 
-    details {
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin: 14px 0;
-      background: rgba(51, 65, 85, 0.4);
-      transition: all 0.3s;
-    }
+    tr:last-child td { border-bottom: none; }
 
-    details:hover {
-      background: rgba(102, 126, 234, 0.12);
-      border-color: var(--primary);
-    }
-
-    details summary {
+    tbody tr {
       cursor: pointer;
-      font-weight: 700;
-      color: var(--primary-light);
-      user-select: none;
+      transition: background 0.15s;
     }
 
-    .spinner {
+    tbody tr:hover { background: var(--primary-light); }
+
+    code { font-family: 'DM Mono', monospace; }
+
+    .cui-badge {
       display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 4px solid var(--border);
-      border-top-color: var(--primary);
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 5px;
+      padding: 2px 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text-2);
+    }
+
+    /* ── REASONING STEPS ── */
+    .step-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      transition: box-shadow 0.2s;
+    }
+
+    .step-card:hover { box-shadow: var(--shadow); }
+
+    .step-summary {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      cursor: pointer;
+      background: var(--surface-2);
+      user-select: none;
+      list-style: none;
+    }
+
+    .step-num {
+      width: 28px; height: 28px;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .label {
-      display: block;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.75rem;
       font-weight: 700;
-      margin-bottom: 10px;
-      color: var(--text);
-      font-size: 0.95em;
-      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
+    .step-action { font-weight: 600; color: var(--text); font-size: 0.9rem; flex: 1; }
+
+    .step-conf {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .step-body {
+      padding: 18px 20px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .step-section {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .step-section:last-child { margin-bottom: 0; }
+
+    .step-section-icon {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-section-icon svg { width: 13px; height: 13px; }
+
+    .step-section-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .step-section-text  { font-size: 0.86rem; color: var(--text-2); line-height: 1.65; }
+
+    /* ── TIMING LIST ── */
+    .timing-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      font-size: 0.84rem;
+    }
+
+    .timing-row strong { color: var(--primary); font-family: 'DM Mono', monospace; }
+
+    /* ── CONCEPT DETAIL ── */
+    .concept-detail {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .detail-field { margin-bottom: 14px; }
+    .detail-field:last-child { margin-bottom: 0; }
+    .detail-field-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 5px; }
+    .detail-field-value { font-size: 0.9rem; color: var(--text); }
+
+    /* ── SEARCH BOX ── */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+    }
+
+    .search-wrap input {
+      padding-left: 42px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* ── LOADING OVERLAY ── */
     .loading-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
+      inset: 0;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(6px);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 999;
-      backdrop-filter: blur(5px);
     }
 
-    .loading-overlay.active {
-      display: flex;
-    }
+    .loading-overlay.active { display: flex; }
 
     .loading-box {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.98) 0%, rgba(51, 65, 85, 0.95) 100%);
-      padding: 50px;
-      border-radius: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 44px 52px;
       text-align: center;
-      border: 2px solid var(--primary);
-      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-lg);
+      max-width: 320px;
     }
 
-    .loading-box .spinner {
-      width: 60px;
-      height: 60px;
-      border-width: 6px;
-      margin-bottom: 25px;
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      margin: 0 auto 22px;
     }
 
-    a {
-      color: #22d3ee;
-      text-decoration: none;
-      word-break: break-all;
-      transition: all 0.3s;
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    a:hover {
-      text-decoration: underline;
-      color: #06b6d4;
-    }
+    .loading-title { font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 6px; }
+    .loading-sub   { font-size: 0.82rem; color: var(--text-muted); }
 
-    .chart-container {
-      position: relative;
-      height: 300px;
-      margin: 24px 0;
-      background: rgba(51, 65, 85, 0.4);
-      border-radius: 14px;
-      padding: 18px;
-      border: 1.5px solid var(--border);
-    }
-
-    .hljs {
-      background: rgba(51, 65, 85, 0.6) !important;
-      color: var(--text) !important;
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 16px !important;
+      color: var(--text);
+      z-index: 1100;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      max-width: 380px;
+      animation: slideInRight 0.3s ease;
+    }
+
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.error   { border-left: 4px solid var(--danger); }
+
+    .toast svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .toast.success svg { color: var(--success); }
+    .toast.error   svg { color: var(--danger); }
+
+    @keyframes slideInRight {
+      from { transform: translateX(140%); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    /* ── MISC ── */
+    .muted { color: var(--text-muted); font-size: 0.88rem; }
+
+    a { color: var(--primary); text-decoration: none; transition: color 0.15s; }
+    a:hover { color: var(--primary-dark); text-decoration: underline; }
+
+    .hljs { background: var(--surface-2) !important; border-radius: 10px; padding: 20px !important; font-size: 12px; border: 1px solid var(--border); }
+
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 14px;
     }
   </style>
 </head>
-
 <body>
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-box">
-      <div class="spinner"></div>
-      <p>🧬 Processing clinical data...</p>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <div class="loading-title">Analyzing Clinical Data</div>
+    <div class="loading-sub">Running concept extraction pipeline…</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <div class="header-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-title">Healthcare Concept Extraction</div>
+      <div class="header-subtitle">Clinical NLP · UMLS Enrichment · AI Reasoning</div>
     </div>
   </div>
-
-  <div class="header">
-    <h1>🏥 Healthcare Concept Extraction</h1>
-    <p>AI-powered clinical concept identification with UMLS enrichment</p>
+  <div class="header-badge">
+    <span class="badge-dot"></span>
+    API Ready
   </div>
+</header>
 
-  <div class="container">
-    <div class="card">
-      <h3>⚙️ Request Configuration</h3>
-      
-      <div class="row">
-        <label class="label" style="flex: 1;">API URL</label>
-        <div class="muted" style="font-size: 0.9em;">Ensure the server is running on port 8002</div>
-      </div>
-      <div class="row">
-        <input id="apiUrl" value="http://127.0.0.1:8002/reason" style="flex: 1;" />
-        <button class="btn-secondary" onclick="testConnection()" title="Test API connectivity">🔗 Test Connection</button>
-      </div>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid-overlay"></div>
+  <div class="hero-inner">
+    <h1>Clinical Concept<br>Extraction API</h1>
+    <p>AI-powered medical entity recognition with UMLS enrichment, reasoning chains, and concept-level negation detection.</p>
+    <div class="hero-pills">
+      <span class="hero-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Real-time Analysis
+      </span>
+      <span class="hero-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+        UMLS Enrichment
+      </span>
+      <span class="hero-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        Negation Detection
+      </span>
+      <span class="hero-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        ReAct Reasoning
+      </span>
+    </div>
+  </div>
+</div>
 
-      <div id="connStatus" style="margin-top: 12px;"></div>
+<!-- MAIN -->
+<div class="main">
 
-      <div class="row" style="margin-top: 22px;">
-        <span class="label">Request Payload</span>
-        <button class="btn-secondary" onclick="formatJSON()" title="Auto-format JSON">📐 Format</button>
-        <button class="btn-secondary" onclick="loadExample()" title="Load example clinical case">📋 Example</button>
-        <button class="btn-secondary" onclick="clearPayload()" title="Clear payload">🗑️ Clear</button>
+  <!-- REQUEST CONFIG CARD -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M5.93 19.07a10 10 0 0 1 0-14.14"/><path d="M22 12a10 10 0 0 1-10 10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
       </div>
-      <textarea id="payload"></textarea>
+      <div>
+        <div class="card-title">Request Configuration</div>
+        <div class="card-subtitle">Configure your API endpoint and clinical payload</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        API Endpoint URL
+      </div>
+      <div class="input-row">
+        <input type="url" id="apiUrl" value="http://127.0.0.1:8002/reason" placeholder="http://127.0.0.1:8002/reason" />
+        <button class="btn btn-outline" onclick="testConnection()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          Test Connection
+        </button>
+      </div>
+      <div id="connStatus"></div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+        Request Payload
+        <span style="margin-left:4px; font-size:0.7rem; font-weight:500; color:var(--text-muted); text-transform:none; letter-spacing:0;">(JSON)</span>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-outline" onclick="formatJSON()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+          Format JSON
+        </button>
+        <button class="btn btn-outline" onclick="loadExample()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          Load Example
+        </button>
+        <button class="btn btn-outline" onclick="clearPayload()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          Clear
+        </button>
+      </div>
+      <textarea id="payload" spellcheck="false"></textarea>
       <div id="reqErr"></div>
     </div>
+  </div>
 
-    <div class="row" style="justify-content: center; margin: 30px 0;">
-      <button class="btn-primary" id="runBtn" onclick="runRequest()" style="font-size: 1.15em; padding: 16px 50px;">
-        ▶️ Run Analysis
+  <!-- RUN BUTTON -->
+  <div class="run-section">
+    <button class="btn btn-primary btn-lg" id="runBtn" onclick="runRequest()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Run Analysis
+    </button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results-section" style="display:none;">
+    <div class="tabs-wrapper">
+      <div class="tabs-nav">
+        <button class="tab-btn active" onclick="switchTab('summary', event)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Summary
+        </button>
+        <button class="tab-btn" onclick="switchTab('concepts', event)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Concepts
+        </button>
+        <button class="tab-btn" onclick="switchTab('umls', event)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          UMLS
+        </button>
+        <button class="tab-btn" onclick="switchTab('reasoning', event)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          Reasoning
+        </button>
+        <button class="tab-btn" onclick="switchTab('raw', event)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Raw JSON
+        </button>
+      </div>
+
+      <div class="tabs-body">
+
+        <!-- SUMMARY TAB -->
+        <div id="summary" class="tab-content active">
+          <div class="grid-2">
+            <div>
+              <div class="section-title">Key Metrics</div>
+              <div class="kpi-grid">
+                <div class="kpi">
+                  <div class="kpi-icon-wrap blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                  </div>
+                  <div class="kpi-label">Status</div>
+                  <div id="kpi-status" class="kpi-value" style="font-size:1.1rem;">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="kpi-icon-wrap teal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                  </div>
+                  <div class="kpi-label">Concepts</div>
+                  <div id="kpi-conceptCount" class="kpi-value">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="kpi-icon-wrap amber">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
+                  <div class="kpi-label">Runtime</div>
+                  <div id="kpi-runtime" class="kpi-value">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="kpi-icon-wrap blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  </div>
+                  <div class="kpi-label">Confidence</div>
+                  <div id="kpi-confidence" class="kpi-value">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="kpi-icon-wrap green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </div>
+                  <div class="kpi-label">Record ID</div>
+                  <div id="kpi-recordId" class="kpi-value" style="font-size:1rem; font-family:'DM Mono',monospace;">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="kpi-icon-wrap blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                  </div>
+                  <div class="kpi-label">Steps</div>
+                  <div id="kpi-steps" class="kpi-value">—</div>
+                </div>
+              </div>
+
+              <div class="conf-section">
+                <div class="conf-label-row">
+                  <span class="conf-label">Extraction Confidence</span>
+                  <span class="conf-pct" id="confPctLabel">0%</span>
+                </div>
+                <div class="confidence-bar">
+                  <div id="confBar" style="width:0%"></div>
+                </div>
+                <div class="muted" style="margin-top:8px;">Overall model confidence in the extraction result</div>
+              </div>
+            </div>
+
+            <div>
+              <div class="section-title">Metadata</div>
+              <div class="meta-list">
+                <div class="meta-item">
+                  <div class="meta-item-icon blue" style="background:var(--primary-light);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  </div>
+                  <div>
+                    <div class="meta-item-label">Model Used</div>
+                    <div id="meta-model" class="meta-item-value">—</div>
+                  </div>
+                </div>
+                <div class="meta-item">
+                  <div class="meta-item-icon" style="background:var(--success-light);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+                  </div>
+                  <div>
+                    <div class="meta-item-label">Self-Corrected</div>
+                    <div id="meta-selfcorr" class="meta-item-value">—</div>
+                  </div>
+                </div>
+                <div class="meta-item">
+                  <div class="meta-item-icon" style="background:var(--accent-light);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                  </div>
+                  <div>
+                    <div class="meta-item-label">Learned from Memory</div>
+                    <div id="meta-memory" class="meta-item-value">—</div>
+                  </div>
+                </div>
+                <div class="meta-item">
+                  <div class="meta-item-icon" style="background:var(--warning-light);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  </div>
+                  <div>
+                    <div class="meta-item-label">Goal</div>
+                    <div id="meta-goal" class="meta-item-value">—</div>
+                  </div>
+                </div>
+                <div class="meta-item" id="timingsWrapper" style="display:none;">
+                  <div class="meta-item-icon" style="background:var(--primary-light);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
+                  <div style="flex:1;">
+                    <div class="meta-item-label">Section Timings</div>
+                    <div id="timingsList" style="margin-top:8px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONCEPTS TAB -->
+        <div id="concepts" class="tab-content">
+          <div class="section-title">Extracted Concepts</div>
+          <p class="muted" style="margin-bottom:18px;">Auto-labeled from clinical context. Click a concept for UMLS details.</p>
+          <div id="conceptsList" class="concepts-wrap"></div>
+        </div>
+
+        <!-- UMLS TAB -->
+        <div id="umls" class="tab-content">
+          <div class="grid-2">
+            <div>
+              <div class="section-title">UMLS Enrichment Table</div>
+              <div class="search-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="filterBox" placeholder="Filter by concept, CUI, or preferred name…" />
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Concept</th>
+                      <th>Preferred Name</th>
+                      <th>CUI</th>
+                      <th>Found</th>
+                      <th>SNOMED</th>
+                    </tr>
+                  </thead>
+                  <tbody id="umlsTable">
+                    <tr><td colspan="5" class="muted">No enrichment data</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div>
+              <div class="section-title">Concept Details</div>
+              <div id="conceptDetail" class="concept-detail">
+                <p class="muted" style="display:flex;align-items:center;gap:8px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Click a row in the table to view detailed UMLS information.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REASONING TAB -->
+        <div id="reasoning" class="tab-content">
+          <div class="section-title">Reasoning Chain</div>
+          <div id="reasoningChain"></div>
+        </div>
+
+        <!-- RAW JSON TAB -->
+        <div id="raw" class="tab-content">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+            <div class="section-title" style="margin:0;">Complete Response</div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-outline" onclick="copyJSON()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy
+              </button>
+              <button class="btn btn-outline" onclick="downloadJSON()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download
+              </button>
+            </div>
+          </div>
+          <pre><code id="rawJson" class="language-json"></code></pre>
+        </div>
+
+      </div><!-- /tabs-body -->
+    </div><!-- /tabs-wrapper -->
+
+    <div style="text-align:center; margin-top:24px;">
+      <button class="btn btn-danger" onclick="clearResults()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        Clear Results
       </button>
     </div>
+  </div><!-- /results-section -->
 
-    <div id="results-section" style="display: none;">
-      <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('summary')">📊 Summary</button>
-        <button class="tab-btn" onclick="switchTab('concepts')">🏷️ Concepts</button>
-        <button class="tab-btn" onclick="switchTab('umls')">🔬 UMLS</button>
-        <button class="tab-btn" onclick="switchTab('reasoning')">🧠 Reasoning</button>
-        <button class="tab-btn" onclick="switchTab('raw')">📄 Raw JSON</button>
-      </div>
-
-      <!-- Summary Tab -->
-      <div id="summary" class="tab-content active">
-        <div class="grid">
-          <div class="card">
-            <h3>📈 Key Metrics</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-              <div class="kpi">
-                <div class="kpi-icon">✅</div>
-                <div class="kpi-label">Status</div>
-                <div id="kpi-status" class="kpi-value" style="color: var(--success);">—</div>
-              </div>
-              <div class="kpi">
-                <div class="kpi-icon">🔢</div>
-                <div class="kpi-label">Concepts</div>
-                <div id="kpi-conceptCount" class="kpi-value">—</div>
-              </div>
-              <div class="kpi">
-                <div class="kpi-icon">⚡</div>
-                <div class="kpi-label">Runtime</div>
-                <div id="kpi-runtime" class="kpi-value">—</div>
-              </div>
-              <div class="kpi">
-                <div class="kpi-icon">🎯</div>
-                <div class="kpi-label">Confidence</div>
-                <div id="kpi-confidence" class="kpi-value">—</div>
-              </div>
-              <div class="kpi">
-                <div class="kpi-icon">🔗</div>
-                <div class="kpi-label">Record ID</div>
-                <div id="kpi-recordId" class="kpi-value" style="font-size: 1.5em;">—</div>
-              </div>
-              <div class="kpi">
-                <div class="kpi-icon">🧩</div>
-                <div class="kpi-label">Steps</div>
-                <div id="kpi-steps" class="kpi-value">—</div>
-              </div>
-            </div>
-
-            <div style="margin-top: 28px;">
-              <label class="kpi-label">🎯 Confidence Score</label>
-              <div class="confidence-bar">
-                <div id="confBar" style="width: 0%"></div>
-              </div>
-              <div class="muted" style="font-size: 0.85em;">Overall model confidence in the extraction</div>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3>ℹ️ Metadata</h3>
-            <div style="display: flex; flex-direction: column; gap: 18px;">
-              <div>
-                <div class="kpi-label">🤖 Model Used</div>
-                <div id="meta-model" class="muted" style="font-size: 1.1em;">—</div>
-              </div>
-              <div>
-                <div class="kpi-label">🔄 Self-Corrected</div>
-                <div id="meta-selfcorr" class="muted" style="font-size: 1.1em;">—</div>
-              </div>
-              <div>
-                <div class="kpi-label">💾 Learned from Memory</div>
-                <div id="meta-memory" class="muted" style="font-size: 1.1em;">—</div>
-              </div>
-              <div>
-                <div class="kpi-label">🎯 Goal</div>
-                <div id="meta-goal" class="muted" style="word-break: break-word; font-size: 1.1em;">—</div>
-              </div>
-              <div>
-                <div class="kpi-label">⏱️ Section Timings</div>
-                <div id="timingsList" class="muted" style="font-size: 0.95em;">No timing data</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Concepts Tab -->
-      <div id="concepts" class="tab-content">
-        <div class="card">
-          <h3>🏷️ Extracted Concepts</h3>
-          <div class="muted" style="margin-bottom: 18px; font-size: 0.95em;">Auto-labeled based on clinical context (PRESENT / NEGATED / UNCERTAIN)</div>
-          <div id="conceptsList"></div>
-        </div>
-      </div>
-
-      <!-- UMLS Tab -->
-      <div id="umls" class="tab-content">
-        <div class="card">
-          <h3>🔬 UMLS Enrichment</h3>
-          <input type="text" id="filterBox" class="filter-box" placeholder="🔍 Filter by concept, CUI, or preferred name..." />
-          <div style="overflow-x: auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th>Concept</th>
-                  <th>Preferred Name</th>
-                  <th>CUI</th>
-                  <th>Status</th>
-                  <th>SNOMED CT</th>
-                </tr>
-              </thead>
-              <tbody id="umlsTable">
-                <tr><td colspan="5" class="muted">No enrichment data</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top: 28px;">
-          <h3>📋 Concept Details</h3>
-          <div id="conceptDetail" class="muted">Click a concept to view detailed UMLS information</div>
-        </div>
-      </div>
-
-      <!-- Reasoning Tab -->
-      <div id="reasoning" class="tab-content">
-        <div id="reasoningChain"></div>
-      </div>
-
-      <!-- Raw JSON Tab -->
-      <div id="raw" class="tab-content">
-        <div class="card">
-          <h3>📄 Complete Response</h3>
-          <div class="row">
-            <button class="btn-success" onclick="copyJSON()">📋 Copy JSON</button>
-            <button class="btn-success" onclick="downloadJSON()">⬇️ Download</button>
-          </div>
-          <pre id="rawJsonPre"><code id="rawJson" class="language-json"></code></pre>
-        </div>
-      </div>
-
-      <div class="row" style="margin-top: 30px; justify-content: center;">
-        <button class="btn-danger" onclick="clearResults()">🗑️ Clear Results</button>
-      </div>
-    </div>
-  </div>
+</div><!-- /main -->
 
 <script>
   const payloadEl = document.getElementById("payload");
-  const apiUrlEl = document.getElementById("apiUrl");
-  const runBtn = document.getElementById("runBtn");
+  const apiUrlEl  = document.getElementById("apiUrl");
+  const runBtn    = document.getElementById("runBtn");
 
   function loadExample() {
     payloadEl.value = JSON.stringify({
@@ -773,261 +1254,258 @@
   loadExample();
 
   function escapeHtml(s) {
-    return String(s || "").replace(/[&<>"']/g, c => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[c]));
+    return String(s || "").replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   }
 
   function formatJSON() {
     try {
-      const parsed = JSON.parse(payloadEl.value);
-      payloadEl.value = JSON.stringify(parsed, null, 2);
-      showToast("✅ Formatted successfully", "success");
-    } catch (e) {
-      showToast("❌ Invalid JSON: " + e.message, "error");
-    }
+      payloadEl.value = JSON.stringify(JSON.parse(payloadEl.value), null, 2);
+      showToast("JSON formatted", "success");
+    } catch(e) { showToast("Invalid JSON: " + e.message, "error"); }
   }
 
   function clearPayload() { payloadEl.value = ""; }
-  function clearResults() { document.getElementById("results-section").style.display = "none"; }
+  function clearResults()  { document.getElementById("results-section").style.display = "none"; }
 
-  function showToast(message, type = "info") {
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-  }
-
-  function switchTab(tabName) {
+  function switchTab(name, e) {
     document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
     document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
-    document.getElementById(tabName).classList.add("active");
-    event.target.classList.add("active");
+    document.getElementById(name).classList.add("active");
+    if (e && e.currentTarget) e.currentTarget.classList.add("active");
+  }
+
+  function showToast(msg, type = "info") {
+    const t = document.createElement("div");
+    t.className = `toast ${type}`;
+    const icon = type === "success"
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+    t.innerHTML = icon + `<span>${escapeHtml(msg)}</span>`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
   }
 
   async function testConnection() {
+    const el = document.getElementById("connStatus");
+    el.innerHTML = "";
     try {
-      const response = await fetch(apiUrlEl.value, {
+      const r = await fetch(apiUrlEl.value, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ clinical_text: "test", record_id: "TEST" })
       });
-      const connStatus = document.getElementById("connStatus");
-      if (response.ok) {
-        connStatus.innerHTML = '<div class="success">✅ Connection successful!</div>';
-      } else {
-        connStatus.innerHTML = '<div class="error">❌ Server returned ' + response.status + '</div>';
-      }
-    } catch (e) {
-      document.getElementById("connStatus").innerHTML = '<div class="error">❌ Connection failed: ' + e.message + '</div>';
+      el.innerHTML = r.ok
+        ? `<div class="alert alert-success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Connection successful — server responded with HTTP ${r.status}</div>`
+        : `<div class="alert alert-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Server returned HTTP ${r.status}</div>`;
+    } catch(e) {
+      el.innerHTML = `<div class="alert alert-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>${escapeHtml(e.message)}</div>`;
     }
   }
 
-  function labelConcept(concept, clinicalText) {
+  function labelConcept(concept, text) {
     const c = String(concept || "").toLowerCase().trim();
-    const t = String(clinicalText || "").toLowerCase();
+    const t = String(text || "").toLowerCase();
     if (!c || !t) return "present";
-
-    const uncertainCues = ["possible", "possibly", "suspect", "suspected", "concern for", "may have", "might have", "rule out", "r/o"];
-    const sentences = t.split(/[\.\!\?]\s+/).map(s => s.trim()).filter(Boolean);
-
-    for (const cue of uncertainCues) {
-      for (const s of sentences) {
-        if (s.includes(cue) && s.includes(c)) return "uncertain";
-      }
-    }
-
-    const negCues = ["denies", "deny", "no ", "without", "negative for", "free of"];
+    const sentences = t.split(/[.!?]\s+/).map(s => s.trim()).filter(Boolean);
+    const uncertain = ["possible","possibly","suspect","suspected","concern for","may have","might have","rule out","r/o"];
+    for (const cue of uncertain) for (const s of sentences) if (s.includes(cue) && s.includes(c)) return "uncertain";
+    const neg = ["denies","deny","no ","without","negative for","free of"];
     for (const s of sentences) {
       if (!s.includes(c)) continue;
-      for (const cue of negCues) {
-        const idxCue = s.indexOf(cue);
-        const idxCon = s.indexOf(c);
-        if (idxCue >= 0 && idxCon >= 0 && idxCue < idxCon) return "negated";
-      }
+      for (const cue of neg) { const ic = s.indexOf(cue), iv = s.indexOf(c); if (ic >= 0 && iv >= 0 && ic < iv) return "negated"; }
     }
     return "present";
   }
 
-  function safeToFixed(x, digits = 2) {
-    return typeof x === "number" && isFinite(x) ? x.toFixed(digits) : String(x ?? "");
-  }
+  function safeToFixed(x, d=2) { return typeof x === "number" && isFinite(x) ? x.toFixed(d) : String(x ?? "—"); }
 
   async function runRequest() {
     document.getElementById("connStatus").innerHTML = "";
-    
     let payload;
-    try {
-      payload = JSON.parse(payloadEl.value);
-    } catch (e) {
-      showToast("❌ Invalid JSON in request", "error");
-      return;
-    }
+    try { payload = JSON.parse(payloadEl.value); }
+    catch(e) { showToast("Invalid JSON in payload", "error"); return; }
 
     runBtn.disabled = true;
     document.getElementById("loadingOverlay").classList.add("active");
 
     try {
-      const response = await fetch(apiUrlEl.value.trim(), {
+      const r = await fetch(apiUrlEl.value.trim(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error("HTTP " + response.status);
+      const data = await r.json();
+      if (!r.ok) throw new Error("HTTP " + r.status);
       if (data.error) throw new Error(data.error);
-
       renderResponse(data, payload);
-      showToast("✅ Analysis complete", "success");
-    } catch (err) {
-      showToast("❌ " + err.message, "error");
+      showToast("Analysis complete", "success");
+    } catch(err) {
+      showToast(err.message, "error");
     } finally {
       runBtn.disabled = false;
       document.getElementById("loadingOverlay").classList.remove("active");
     }
   }
 
+  function statusIcon(ok) {
+    return ok
+      ? `<svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+  }
+
   function renderResponse(resp, req) {
     window._lastResp = resp;
-    window._lastReq = req;
-
+    window._lastReq  = req;
     document.getElementById("results-section").style.display = "block";
 
-    document.getElementById("kpi-status").textContent = resp.status || "—";
-    document.getElementById("kpi-recordId").textContent = resp.record_id || "—";
+    document.getElementById("kpi-status").textContent       = resp.status || "—";
+    document.getElementById("kpi-recordId").textContent     = resp.record_id || "—";
     document.getElementById("kpi-conceptCount").textContent = (resp.extracted_concepts || []).length;
-    document.getElementById("kpi-runtime").textContent = safeToFixed(resp.script_runtime, 2) + "s";
-    document.getElementById("kpi-steps").textContent = resp.total_reasoning_steps || "—";
-    
+    document.getElementById("kpi-runtime").textContent      = safeToFixed(resp.script_runtime, 2) + "s";
+    document.getElementById("kpi-steps").textContent        = resp.total_reasoning_steps || "—";
+
     const conf = typeof resp.confidence === "number" ? Math.round(resp.confidence * 100) : 0;
     document.getElementById("kpi-confidence").textContent = conf + "%";
-    document.getElementById("confBar").style.width = conf + "%";
+    document.getElementById("confPctLabel").textContent   = conf + "%";
+    document.getElementById("confBar").style.width        = conf + "%";
 
-    document.getElementById("meta-model").textContent = resp.model_used || "—";
-    document.getElementById("meta-selfcorr").textContent = resp.self_corrected ? "✅ Yes" : "❌ No";
-    document.getElementById("meta-memory").textContent = resp.learned_from_memory ? "✅ Yes" : "❌ No";
-    document.getElementById("meta-goal").textContent = resp.goal || "—";
+    document.getElementById("meta-model").innerHTML    = `<span style="font-family:'DM Mono',monospace;font-size:0.85rem;">${escapeHtml(resp.model_used || "—")}</span>`;
+    document.getElementById("meta-selfcorr").innerHTML = resp.self_corrected
+      ? `<span style="display:inline-flex;align-items:center;gap:6px;color:var(--success);">${statusIcon(true)} Yes</span>`
+      : `<span style="display:inline-flex;align-items:center;gap:6px;color:var(--danger);">${statusIcon(false)} No</span>`;
+    document.getElementById("meta-memory").innerHTML   = resp.learned_from_memory
+      ? `<span style="display:inline-flex;align-items:center;gap:6px;color:var(--success);">${statusIcon(true)} Yes</span>`
+      : `<span style="display:inline-flex;align-items:center;gap:6px;color:var(--danger);">${statusIcon(false)} No</span>`;
+    document.getElementById("meta-goal").textContent   = resp.goal || "—";
 
     const timings = resp.section_timings || {};
-    const timingsList = document.getElementById("timingsList");
     if (Object.keys(timings).length) {
-      timingsList.innerHTML = Object.entries(timings).map(([k, v]) => 
-        `<div style="display: flex; justify-content: space-between; margin: 8px 0; padding: 8px; background: rgba(102,126,234,0.1); border-radius: 6px;">
-          <span>${escapeHtml(k)}</span>
-          <strong>${safeToFixed(v, 2)}s</strong>
-        </div>`
+      document.getElementById("timingsWrapper").style.display = "flex";
+      document.getElementById("timingsList").innerHTML = Object.entries(timings).map(([k, v]) =>
+        `<div class="timing-row"><span>${escapeHtml(k)}</span><strong>${safeToFixed(v, 2)}s</strong></div>`
       ).join("");
     }
 
+    // Concepts
     const concepts = (resp.extracted_concepts || []).map(c => {
       const status = labelConcept(c, req.clinical_text || "");
-      const tagClass = status === "negated" ? "negated" : (status === "uncertain" ? "uncertain" : "present");
-      const tagText = { negated: "NEGATED", uncertain: "UNCERTAIN", present: "PRESENT" }[status];
-      return `
-        <button class="pill concept-chip" onclick="showConceptDetail(${JSON.stringify(c)})">
-          <span>${escapeHtml(c)}</span>
-          <span class="tag ${tagClass}">${tagText}</span>
-        </button>
-      `;
+      const tagClass = status === "negated" ? "negated" : status === "uncertain" ? "uncertain" : "present";
+      const tagText  = { negated: "NEGATED", uncertain: "UNCERTAIN", present: "PRESENT" }[status];
+      return `<button class="concept-chip" onclick="showConceptDetail(${JSON.stringify(c)})">
+        ${escapeHtml(c)}
+        <span class="tag ${tagClass}"><span class="tag-dot"></span>${tagText}</span>
+      </button>`;
     }).join("");
-    document.getElementById("conceptsList").innerHTML = concepts || '<div class="muted">No concepts extracted</div>';
+    document.getElementById("conceptsList").innerHTML = concepts || '<p class="muted">No concepts extracted.</p>';
 
-    const umls = resp.umls_enrichment || {};
-    const umlsRows = Object.entries(umls).map(([concept, u]) => {
-      const snomedLinks = (u.snomed_ct || []).length
-        ? u.snomed_ct.map(url => `<a href="${escapeHtml(url)}" target="_blank">🔗</a>`).join(" ")
+    // UMLS Table
+    const umlsRows = Object.entries(resp.umls_enrichment || {}).map(([concept, u]) => {
+      const snomed = (u.snomed_ct || []).length
+        ? u.snomed_ct.map(url => `<a href="${escapeHtml(url)}" target="_blank">↗</a>`).join(" ")
         : "—";
-      return `
-        <tr onclick="showConceptDetail(${JSON.stringify(concept)})">
-          <td><strong>${escapeHtml(concept)}</strong></td>
-          <td>${escapeHtml(u.preferred_name || "")}</td>
-          <td><code>${escapeHtml(u.cui || "")}</code></td>
-          <td>${u.found ? "✅" : "❌"}</td>
-          <td>${snomedLinks}</td>
-        </tr>
-      `;
+      return `<tr onclick="showConceptDetail(${JSON.stringify(concept)})">
+        <td><strong>${escapeHtml(concept)}</strong></td>
+        <td>${escapeHtml(u.preferred_name || "")}</td>
+        <td><span class="cui-badge">${escapeHtml(u.cui || "")}</span></td>
+        <td>${u.found
+          ? `<span style="display:inline-flex;align-items:center;gap:4px;color:var(--success);font-weight:600;font-size:0.8rem;">${statusIcon(true)} Yes</span>`
+          : `<span style="display:inline-flex;align-items:center;gap:4px;color:var(--danger);font-weight:600;font-size:0.8rem;">${statusIcon(false)} No</span>`}</td>
+        <td>${snomed}</td>
+      </tr>`;
     }).join("");
-    document.getElementById("umlsTable").innerHTML = umlsRows || '<tr><td colspan="5" class="muted">No enrichment</td></tr>';
+    document.getElementById("umlsTable").innerHTML = umlsRows || '<tr><td colspan="5" class="muted" style="padding:20px;">No UMLS enrichment data</td></tr>';
 
-    const filterBox = document.getElementById("filterBox");
-    filterBox.value = "";
-    filterBox.addEventListener("input", () => {
-      const q = filterBox.value.toLowerCase();
-      document.querySelectorAll("#umlsTable tr").forEach(tr => {
-        tr.style.display = tr.innerText.toLowerCase().includes(q) ? "" : "none";
-      });
-    });
+    // Filter
+    const fb = document.getElementById("filterBox");
+    fb.value = "";
+    fb.oninput = () => {
+      const q = fb.value.toLowerCase();
+      document.querySelectorAll("#umlsTable tr").forEach(tr => { tr.style.display = tr.innerText.toLowerCase().includes(q) ? "" : "none"; });
+    };
 
+    // Reasoning
     const steps = (resp.reasoning_chain || []).map(s => `
-      <details class="card">
-        <summary><strong>Step ${escapeHtml(s.step_number)}</strong> — ${escapeHtml(s.action)} <span class="muted">(conf ${safeToFixed(s.confidence)})</span></summary>
-        <div>
-          <div><strong>💭 Thought:</strong> ${escapeHtml(s.thought)}</div>
-          <div style="margin-top: 12px;"><strong>👀 Observation:</strong> ${escapeHtml(s.observation)}</div>
+      <details class="step-card">
+        <summary class="step-summary">
+          <span class="step-num">${escapeHtml(String(s.step_number))}</span>
+          <span class="step-action">${escapeHtml(s.action)}</span>
+          <span class="step-conf">conf ${safeToFixed(s.confidence)}</span>
+        </summary>
+        <div class="step-body">
+          <div class="step-section">
+            <div class="step-section-icon" style="background:var(--primary-light);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div>
+              <div class="step-section-label">Thought</div>
+              <div class="step-section-text">${escapeHtml(s.thought)}</div>
+            </div>
+          </div>
+          <div class="step-section">
+            <div class="step-section-icon" style="background:var(--accent-light);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div>
+              <div class="step-section-label">Observation</div>
+              <div class="step-section-text">${escapeHtml(s.observation)}</div>
+            </div>
+          </div>
         </div>
       </details>
     `).join("");
-    document.getElementById("reasoningChain").innerHTML = steps || '<div class="card muted">No reasoning steps</div>';
+    document.getElementById("reasoningChain").innerHTML = steps || '<p class="muted">No reasoning steps available.</p>';
 
+    // Raw JSON
     document.getElementById("rawJson").textContent = JSON.stringify(resp, null, 2);
     hljs.highlightElement(document.getElementById("rawJson"));
+
+    window.scrollTo({ top: document.getElementById("results-section").offsetTop - 90, behavior: "smooth" });
   }
 
   window.showConceptDetail = function(concept) {
     const resp = window._lastResp || {};
-    const req = window._lastReq || {};
+    const req  = window._lastReq  || {};
     const u = (resp.umls_enrichment || {})[concept];
-    const status = labelConcept(concept, req.clinical_text || "");
-    const tagClass = status === "negated" ? "negated" : (status === "uncertain" ? "uncertain" : "present");
-    const tagText = { negated: "NEGATED", uncertain: "UNCERTAIN", present: "PRESENT" }[status];
+    const status   = labelConcept(concept, req.clinical_text || "");
+    const tagClass = status === "negated" ? "negated" : status === "uncertain" ? "uncertain" : "present";
+    const tagText  = { negated: "NEGATED", uncertain: "UNCERTAIN", present: "PRESENT" }[status];
 
-    let html = `
-      <div class="row">
-        <strong>${escapeHtml(concept)}</strong>
-        <span class="tag ${tagClass}">${tagText}</span>
-      </div>
-    `;
+    let html = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <strong style="font-size:1rem;">${escapeHtml(concept)}</strong>
+      <span class="tag ${tagClass}"><span class="tag-dot"></span>${tagText}</span>
+    </div>`;
 
     if (u) {
       const snomed = (u.snomed_ct || []).length
-        ? u.snomed_ct.map(x => `<div><a href="${escapeHtml(x)}" target="_blank">🔗 ${escapeHtml(x)}</a></div>`).join("")
+        ? u.snomed_ct.map(x => `<div><a href="${escapeHtml(x)}" target="_blank">${escapeHtml(x)}</a></div>`).join("")
         : "—";
       html += `
-        <div style="margin-top: 16px;">
-          <div><strong>Preferred Name:</strong> ${escapeHtml(u.preferred_name || "")}</div>
-          <div style="margin-top: 10px;"><strong>CUI:</strong> <code style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 4px;">${escapeHtml(u.cui || "")}</code></div>
-          <div style="margin-top: 10px;"><strong>Found:</strong> ${u.found ? "✅ Yes" : "❌ No"}</div>
-          <div style="margin-top: 10px;"><strong>SNOMED CT:</strong><div style="margin-top: 8px;">${snomed}</div></div>
-        </div>
+        <div class="detail-field"><div class="detail-field-label">Preferred Name</div><div class="detail-field-value">${escapeHtml(u.preferred_name || "—")}</div></div>
+        <div class="detail-field"><div class="detail-field-label">CUI</div><div class="detail-field-value"><span class="cui-badge">${escapeHtml(u.cui || "—")}</span></div></div>
+        <div class="detail-field"><div class="detail-field-label">Found in UMLS</div><div class="detail-field-value">${u.found ? '<span style="color:var(--success);font-weight:600;">Yes</span>' : '<span style="color:var(--danger);font-weight:600;">No</span>'}</div></div>
+        <div class="detail-field"><div class="detail-field-label">SNOMED CT Links</div><div class="detail-field-value" style="margin-top:4px;">${snomed}</div></div>
       `;
     } else {
-      html += '<div class="muted" style="margin-top: 16px;">No UMLS enrichment data</div>';
+      html += '<p class="muted" style="margin-top:10px;">No UMLS enrichment data for this concept.</p>';
     }
 
     document.getElementById("conceptDetail").innerHTML = html;
   };
 
   window.copyJSON = async function() {
-    const json = JSON.stringify(window._lastResp, null, 2);
     try {
-      await navigator.clipboard.writeText(json);
-      showToast("✅ Copied to clipboard", "success");
-    } catch {
-      showToast("❌ Copy failed", "error");
-    }
+      await navigator.clipboard.writeText(JSON.stringify(window._lastResp, null, 2));
+      showToast("Copied to clipboard", "success");
+    } catch { showToast("Copy failed", "error"); }
   };
 
   window.downloadJSON = function() {
-    const json = JSON.stringify(window._lastResp, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
+    const blob = new Blob([JSON.stringify(window._lastResp, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
-    a.href = url;
+    a.href = URL.createObjectURL(blob);
     a.download = (window._lastResp?.record_id || "concept-extraction") + ".json";
     a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   };
 </script>
 </body>
