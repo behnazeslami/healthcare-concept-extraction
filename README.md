@@ -4,7 +4,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A **true agentic AI system** for extracting and classifying clinical concepts from unstructured medical notes using local LLMs (Llama 3.1, Mistral) with autonomous decision-making, multi-step reasoning, UMLS enrichment, and self-correction capabilities.
+A **true agentic AI system** for extracting and classifying clinical concepts from unstructured medical notes using local LLMs (Llama 3.1-8B-Instruct) with autonomous decision-making, multi-step reasoning, UMLS enrichment, and self-correction capabilities.
 
 ## 🎥 Demo
 
