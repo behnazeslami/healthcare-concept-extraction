@@ -301,6 +301,12 @@ Run via web UI:
 - [SNOMED CT Browser](https://browser.ihtsdotools.org/)
 - [FastAPI Docs](https://fastapi.tiangolo.com/)
 
+### 📖 Related Publications
+
+**[A Hybrid Language Framework for Ontology-Based Clinical Concept Extraction](https://www.researchgate.net/profile/Behnaz-Eslami/publication/401258282_A_Hybrid_Language_Framework_for_Ontology-Based_Clinical_Concept_Extraction/links/69b1c7b7e4cc384db521d422/A-Hybrid-Language-Framework-for-Ontology-Based-Clinical-Concept-Extraction.pdf)**
+
+Eslami B, Dligach D, Azarvash N, de la Pena P, Strickland B, Tootooni S. *Journal of Healthcare Informatics Research*, 2026 Feb 26:1-8.
+
 ## 📄 License
 
 MIT License - See LICENSE file
