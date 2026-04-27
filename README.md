@@ -294,6 +294,10 @@ Run via web UI:
 **Issue**: LLM model not loading
 - Solution: Ensure model path is correct in config, check available disk space
 
+## 🧭 Flowchart
+
+The full system flowchart is available in [FLOWCHART.md](FLOWCHART.md). GitHub renders the Mermaid diagram in that file directly, so anyone browsing the repository can open it and see the figure.
+
 ## 📚 Resources
 
 - [ReACT Paper](https://arxiv.org/abs/2210.03629) - Reasoning + Acting in LLMs
