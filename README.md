@@ -306,7 +306,7 @@ MIT License - See LICENSE file
 
 ## 👨‍💻 Author
 
-Dr. Tootooni Medical NLP Lab
+Behnaz Eslami
 
 ## 🤝 Contributing
 
